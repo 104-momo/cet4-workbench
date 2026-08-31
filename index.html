@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>四级冲刺工作台 · 15周每日计划</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F2EA;
+  --surface:#FFFFFF;
+  --surface2:#FBF8F2;
+  --ink:#22303C;
+  --muted:#77818C;
+  --line:#E7E0D3;
+  --primary:#2C5F5A;
+  --primary-deep:#244D49;
+  --primary-soft:#E4EFEC;
+  --accent:#E8633C;
+  --accent-soft:#FBE9E2;
+  --ok:#3E7C4F;
+  --ok-soft:#E5F0E8;
+  --warn:#B7791F;
+  --warn-soft:#FBF3DF;
+  --radius:14px;
+  --font-display:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --font-body:"Noto Sans SC","PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-body);color:var(--ink);background:var(--bg);line-height:1.65;font-size:15px}
+#errbar{display:none;position:fixed;left:0;right:0;top:0;width:100%;z-index:999;background:#7f1d1d;color:#fff;font-size:12px;padding:8px 14px;text-align:center;line-height:1.4}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#D8D0BF;border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
+
+.app{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:228px 1fr;min-height:100vh}
+/* ===== 侧边栏 ===== */
+.sidebar{background:var(--surface2);border-right:1px solid var(--line);padding:26px 18px;display:flex;flex-direction:column;gap:8px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:17px;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--muted)}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:var(--muted);font-weight:500;transition:background .15s,color .15s}
+.nav-item svg{flex:none}
+.nav-item:hover{background:var(--primary-soft);color:var(--primary-deep)}
+.nav-item.active{background:var(--primary);color:#fff}
+.sidebar-foot{margin-top:auto;font-size:11px;color:var(--muted);padding:14px 8px 0;border-top:1px dashed var(--line);line-height:1.7}
+
+/* ===== 主区 ===== */
+.main{padding:30px 34px 90px;min-width:0}
+.view{display:none}
+.view.active{display:block}
+.hero{margin-bottom:22px}
+.hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hero h1{font-family:var(--font-display);font-weight:900;font-size:30px;letter-spacing:.5px}
+.hero .todayline{color:var(--muted);font-size:13px;margin-top:6px}
+.countdown{text-align:right}
+.countdown .num{font-family:var(--font-display);font-weight:900;font-size:34px;color:var(--accent);line-height:1}
+.countdown .lab{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* 15 格周进度带 */
+.weeks{display:grid;grid-template-columns:repeat(15,1fr);gap:5px;margin:18px 0 6px}
+.week-cell{height:34px;border-radius:7px;background:#E8E1D2;position:relative;display:flex;align-items:center;justify-content:center}
+.week-cell .w{font-size:9px;color:transparent}
+.week-cell.filled{background:var(--primary)}
+.week-cell.filled .w{color:#fff}
+.week-cell.cur{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.week-cell.cur .w{color:#fff;font-weight:700}
+.weeks-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:20px}
+
+/* 卡片 */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px}
+.card h2{font-family:var(--font-display);font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.card h2 .tag{font-family:var(--font-body);font-size:11px;font-weight:500;background:var(--primary-soft);color:var(--primary-deep);padding:2px 9px;border-radius:20px}
+.card .desc{color:var(--muted);font-size:13px;margin-top:4px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.progress-wrap{margin-top:12px}
+.progress-track{height:9px;border-radius:6px;background:#EEE7D9;overflow:hidden}
+.progress-fill{height:100%;border-radius:6px;background:var(--primary);transition:width .4s}
+.progress-text{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px}
+
+/* 阶段徽标 */
+.phase-banner{display:flex;align-items:center;gap:14px;background:var(--primary);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;flex-wrap:wrap}
+.phase-banner .pb-tag{font-size:11px;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px}
+.phase-banner .pb-name{font-family:var(--font-display);font-weight:700;font-size:19px}
+.phase-banner .pb-date{font-size:12px;opacity:.85}
+.phase-banner .pb-right{margin-left:auto;text-align:right;font-size:12px;opacity:.9}
+
+/* 提醒条 */
+.alert{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);border:1px solid #EFDFB8;border-radius:12px;padding:12px 15px;font-size:13px;margin-bottom:16px}
+.alert svg{flex:none;margin-top:2px}
+
+/* 任务清单 */
+.task-block{margin-bottom:18px}
+.task-block-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px}
+.task-block-title .blk-hint{font-size:11px;font-weight:500;color:var(--muted);background:var(--surface2);border:1px solid var(--line);padding:2px 9px;border-radius:20px}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--surface);transition:background .15s,border-color .15s}
+.task-item:hover{border-color:#CFC6B2}
+.task-item.done{background:var(--ok-soft);border-color:#CDE3D3}
+.task-check{width:22px;height:22px;border-radius:7px;border:2px solid #C9C0AE;background:#fff;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task-item.done .task-check{background:var(--ok);border-color:var(--ok)}
+.task-check svg{opacity:0}
+.task-item.done .task-check svg{opacity:1;color:#fff}
+.task-text{flex:1;font-size:14px}
+.task-item.done .task-text{color:var(--muted);text-decoration:line-through}
+.task-link{font-size:12px;color:var(--primary);background:var(--primary-soft);padding:3px 10px;border-radius:20px;flex:none}
+.task-link:hover{background:var(--primary);color:#fff}
+
+/* 快捷入口 */
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.quick a{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);transition:transform .12s,border-color .12s,box-shadow .12s}
+.quick a:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 6px 16px rgba(34,48,60,.08)}
+.quick .q-ic{color:var(--primary)}
+.quick .q-name{font-weight:700;font-size:14px}
+.quick .q-note{font-size:12px;color:var(--muted)}
+
+/* 计划页时间线 */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line);border-radius:2px}
+.tl-node{position:relative;margin-bottom:16px}
+.tl-node::before{content:"";position:absolute;left:-26px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 2px var(--primary)}
+.phase-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.phase-head{display:flex;align-items:center;gap:12px;padding:16px 20px;flex-wrap:wrap}
+.phase-dot{width:12px;height:12px;border-radius:4px;flex:none}
+.phase-name{font-family:var(--font-display);font-weight:700;font-size:17px}
+.phase-meta{font-size:12px;color:var(--muted)}
+.phase-tag{margin-left:auto;font-size:11px;padding:3px 11px;border-radius:20px;font-weight:500}
+.phase-desc{padding:0 20px 6px;color:var(--muted);font-size:13px}
+.phase-body{padding:10px 20px 18px}
+.phase-body h4{font-size:12px;color:var(--muted);font-weight:700;margin:10px 0 6px;letter-spacing:1px}
+.phase-body ul{padding-left:18px;color:var(--ink);font-size:13.5px}
+.phase-body li{margin-bottom:5px}
+
+/* 资源页 */
+.res-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.res-cat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+.res-cat-head{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.res-cat-head .rc-ic{color:var(--primary)}
+.res-cat h3{font-family:var(--font-display);font-weight:700;font-size:16px}
+.res-cat .rc-desc{font-size:12px;color:var(--muted);margin-bottom:12px}
+.res-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.res-item .ri-body{flex:1;min-width:0}
+.res-item .ri-name{font-weight:700;font-size:13.5px}
+.res-item:hover .ri-name{color:var(--primary)}
+.res-item .ri-note{font-size:12px;color:var(--muted);margin-top:2px}
+.res-item .ri-go{flex:none;color:var(--primary);margin-top:2px}
+.external-note{font-size:12px;color:var(--muted);background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin-top:14px}
+
+/* 日历 */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head .cal-month{font-family:var(--font-display);font-weight:700;font-size:18px}
+.cal-nav{display:flex;gap:8px}
+.cal-nav button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;display:flex;align-items:center;justify-content:center}
+.cal-nav button:hover{background:var(--primary-soft);border-color:var(--primary)}
+.cal-nav button:disabled{opacity:.35;cursor:default}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0}
+.cal-cell{min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px;position:relative;font-size:11px}
+.cal-cell.out{background:var(--surface2);color:#C4BBA6}
+.cal-cell .d{font-weight:700;margin-bottom:4px}
+.cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.cal-cell.done{background:var(--ok-soft);border-color:#CDE3D3}
+.cal-cell.partial{background:var(--warn-soft);border-color:#EFDFB8}
+.cal-cell.exam{background:var(--accent-soft);border-color:#F3C6B8}
+.cal-bar{height:5px;border-radius:3px;background:var(--ok);margin-top:4px}
+.cal-cell.partial .cal-bar{background:var(--warn)}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--muted)}
+.cal-legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px}
+.cal-legend .lg-done{background:var(--ok-soft);border:1px solid #CDE3D3}
+.cal-legend .lg-part{background:var(--warn-soft);border:1px solid #EFDFB8}
+.cal-legend .lg-today{background:#fff;border:2px solid var(--accent)}
+
+/* 底部标签栏（移动端） */
+.tabbar{display:none}
+
+@media (max-width:768px){
+  body{font-size:14px}
+  .app{display:block}
+  .sidebar{display:none}
+  .main{padding:18px 16px 96px}
+  .hero h1{font-size:24px}
+  .countdown .num{font-size:28px}
+  .countdown{text-align:left}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);font-size:10.5px}
+  .tabbar a.active{color:var(--primary)}
+  .phase-banner .pb-right{margin-left:0;text-align:left;width:100%}
+  .res-cats{grid-template-columns:1fr}
+  .quick{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<div id="errbar"></div>
+<div class="app">
+
+  <!-- 侧边栏（桌面端） -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7.5 12 3l7 4.5"/><path d="M5 7.5V18a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V7.5"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">四级冲刺台</div>
+        <div class="brand-sub">2026 · 12/12 考试</div>
+      </div>
+    </div>
+    <a class="nav-item" href="#/today" data-nav="today">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+      今日任务
+    </a>
+    <a class="nav-item" href="#/plan" data-nav="plan">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      备考计划
+    </a>
+    <a class="nav-item" href="#/resources" data-nav="resources">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+      学习资源
+    </a>
+    <a class="nav-item" href="#/calendar" data-nav="calendar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 15h.01M13 15h.01M17 15h.01M9 18.5h.01M13 18.5h.01"/></svg>
+      打卡日历
+    </a>
+    <div class="sidebar-foot">打卡数据保存在本机浏览器。<br>换设备或清缓存会清空。</div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main">
+    <div class="hero">
+      <div class="hero-row">
+        <div>
+          <h1>四级冲刺工作台</h1>
+          <div class="todayline" id="todayline">正在加载…</div>
+        </div>
+        <div class="countdown">
+          <div class="num" id="countdown-num">—</div>
+          <div class="lab">距 12/12 四级笔试</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日 -->
+    <section class="view" id="view-today" data-route="today"></section>
+    <!-- 计划 -->
+    <section class="view" id="view-plan" data-route="plan"></section>
+    <!-- 资源 -->
+    <section class="view" id="view-resources" data-route="resources"></section>
+    <!-- 日历 -->
+    <section class="view" id="view-calendar" data-route="calendar"></section>
+  </main>
+
+  <!-- 底部标签栏（移动端） -->
+  <nav class="tabbar">
+    <a href="#/today" data-nav="today">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+      今日
+    </a>
+    <a href="#/plan" data-nav="plan">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      计划
+    </a>
+    <a href="#/resources" data-nav="resources">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+      资源
+    </a>
+    <a href="#/calendar" data-nav="calendar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 15h.01M13 15h.01M17 15h.01M9 18.5h.01M13 18.5h.01"/></svg>
+      日历
+    </a>
+  </nav>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============ 常量与日期 ============ */
+  var EXAM = new Date(2026, 11, 12);            // 2026-12-12 考试日
+  var START = new Date(2026, 8, 1);             // 2026-09-01 备考第 1 天
+  var P1_END = new Date(2026, 8, 27);           // 9/27
+  var P2_END = new Date(2026, 10, 1);           // 11/1
+  var P3_END = new Date(2026, 10, 29);          // 11/29
+  var P4_END = new Date(2026, 11, 11);          // 12/11
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  function dkey(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+  function midnight(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function daysSinceStart(d){ return Math.round((midnight(d) - midnight(START)) / 86400000); }
+  function daysUntilExam(d){ return Math.round((midnight(EXAM) - midnight(d)) / 86400000); }
+
+  /* 阶段判定 */
+  function phaseFor(d){
+    var t = midnight(d).getTime();
+    if (t < midnight(START).getTime()) return 'before';
+    if (t <= midnight(P1_END).getTime()) return 'p1';
+    if (t <= midnight(P2_END).getTime()) return 'p2';
+    if (t <= midnight(P3_END).getTime()) return 'p3';
+    if (t <= midnight(P4_END).getTime()) return 'p4';
+    if (t === midnight(EXAM).getTime()) return 'exam';
+    return 'after';
+  }
+
+  /* 周数（1–15，用于 15 格进度带） */
+  function weekNo(d){
+    var n = daysSinceStart(d) + 1;
+    if (n < 1) return 0;
+    if (n > 105) return 15;
+    var w = Math.ceil(n / 7);
+    return Math.min(15, Math.max(1, w));
+  }
+
+  /* ============ 数据 ============ */
+  var PHASES = [
+    { key:'p1', name:'词汇 · 语法地基', weeks:'第 1–4 周', dates:'9/1 – 9/27', tag:'打地基',
+      color:'#2C5F5A', soft:'#E4EFEC',
+      desc:'先解决“看不懂、听不懂”。4 周内过完约 1500 个四级核心高频词，补齐基础语法，用 0.8 倍速听力热身。',
+      weekPlan:[
+        '每天 40–60 个新词 + 复习旧词',
+        '每天 1 个语法点 + 5 道练习',
+        '每天 2 篇简单阅读过渡',
+        '每天听力入门 20 分钟（0.8 倍速）',
+        '周日复习全周单词 + 半套早年真题（不掐时）'
+      ] },
+    { key:'p2', name:'分项能力训练', weeks:'第 5–9 周', dates:'9/28 – 11/1', tag:'上强度',
+      color:'#3E7C8A', soft:'#E3F0F2',
+      desc:'分题型逐个击破：听力精听、阅读“定位-匹配-验证”三步法，写译开始背模板。',
+      weekPlan:[
+        '词汇每天 40 个真题词 + 复习',
+        '听力精听 25–30 分钟（真题 0.9–1.0 倍速）',
+        '阅读每天 2 篇仔细阅读',
+        '选词填空 / 段落匹配 每周 3 次',
+        '写译每周各 2 篇（背模板仿写）',
+        '周日 1 套完整真题（不含作文）限时'
+      ] },
+    { key:'p3', name:'真题强化', weeks:'第 10–13 周', dates:'11/2 – 11/29', tag:'刷真题',
+      color:'#4A6FA5', soft:'#E7EDF7',
+      desc:'以真题为核心：每周 2 套整卷限时，错题复盘，作文模板背到脱口而出。',
+      weekPlan:[
+        '词汇转错词本复习（每天 30 分钟）',
+        '听力 / 阅读每天分项刷真题 40 分钟',
+        '写译每周 3 篇作文 + 3 篇翻译',
+        '每周 2 套整卷限时（周六上午 9:00）',
+        '每周 1 小时错题复盘'
+      ] },
+    { key:'p4', name:'全真冲刺', weeks:'第 14–15 周', dates:'11/30 – 12/11', tag:'冲刺',
+      color:'#C05A3B', soft:'#F8E9E2',
+      desc:'完全模拟考场：整卷限时模考、模板冲刺、调整状态，考前一天休息。',
+      weekPlan:[
+        '每 1–2 天一套整卷限时模考（严格 9:00–11:20）',
+        '每天 30 分钟听力保持手感',
+        '背熟 3–4 套作文模板 + 翻译高频词',
+        '不再背新词，只看错词本',
+        '12/11 休息调整，12/12 考试'
+      ] }
+  ];
+
+  var TASKS = {
+    p1: [
+      { block:'morning', label:'早晨 · 词汇', hint:'约 30 分钟', items:[
+        { id:'p1_new', text:'背新词 40 个（四级核心高频词）' },
+        { id:'p1_rev', text:'复习前一日单词' },
+        { id:'p1_say', text:'跟读发音 5 分钟，开口说' }
+      ]},
+      { block:'noon', label:'午间 · 听力入门', hint:'约 20 分钟', items:[
+        { id:'p1_ls', text:'听力入门 20 分钟（0.8 倍速）' },
+        { id:'p1_dict', text:'精听 3 句并跟读，适应语速' }
+      ]},
+      { block:'evening', label:'晚间 · 语法 + 阅读', hint:'约 1 小时', items:[
+        { id:'p1_gram', text:'学 1 个语法点 + 做 5 道练习' },
+        { id:'p1_read', text:'做 2 篇简单阅读（向四级过渡）' },
+        { id:'p1_note', text:'当天生词整理进生词本' }
+      ]},
+      { block:'sunday', label:'周日 · 复盘', hint:'本周收尾', items:[
+        { id:'p1_review', text:'复习本周全部单词' },
+        { id:'p1_paper', text:'做 1 套早年真题的听力 + 阅读（不掐时）' }
+      ]}
+    ],
+    p2: [
+      { block:'morning', label:'早晨 · 词汇', hint:'约 30 分钟', items:[
+        { id:'p2_new', text:'背新词 40 个（真题词汇）' },
+        { id:'p2_rev', text:'复习前一日单词 + 生词本' },
+        { id:'p2_quiz', text:'自测前一周单词，错的重新背' }
+      ]},
+      { block:'noon', label:'午间 · 听力精听', hint:'约 30 分钟', items:[
+        { id:'p2_ls', text:'真题听力精听 25–30 分钟（0.9–1.0 倍速）' },
+        { id:'p2_follow', text:'逐句跟读，模仿语音语调' }
+      ]},
+      { block:'evening', label:'晚间 · 阅读 + 写译', hint:'约 1 小时', items:[
+        { id:'p2_read', text:'仔细阅读 2 篇（定位-匹配-验证）' },
+        { id:'p2_opt', text:'选词填空 / 段落匹配（隔天交替）' },
+        { id:'p2_wt', text:'写译：1 篇作文 或 1 篇翻译（背模板仿写）' }
+      ]},
+      { block:'sunday', label:'周日 · 限时整卷', hint:'本周收尾', items:[
+        { id:'p2_review', text:'本周生词全过一遍' },
+        { id:'p2_paper', text:'1 套完整真题限时（不含作文）' }
+      ]}
+    ],
+    p3: [
+      { block:'morning', label:'早晨 · 词汇', hint:'约 30 分钟', items:[
+        { id:'p3_rev', text:'错词本复习 30 分钟' },
+        { id:'p3_read_aw', text:'朗读 1 篇真题阅读 5 分钟（磨语感）' }
+      ]},
+      { block:'noon', label:'午间 · 听力', hint:'约 30 分钟', items:[
+        { id:'p3_ls', text:'真题听力精听 30 分钟' },
+        { id:'p3_err', text:'重听错题段，找出漏听原因' }
+      ]},
+      { block:'evening', label:'晚间 · 真题分项', hint:'约 1.5 小时', items:[
+        { id:'p3_read', text:'真题阅读 2 篇 + 段落匹配 1 篇' },
+        { id:'p3_cloze', text:'选词填空 1 篇' },
+        { id:'p3_wt', text:'写译：作文 1 篇 或 翻译 1 篇（套模板）' }
+      ]},
+      { block:'sunday', label:'周日 · 整卷模拟', hint:'本周收尾', items:[
+        { id:'p3_paper', text:'1 套整卷限时模拟（周六/周日完成）' },
+        { id:'p3_summary', text:'错题本复盘 1 小时，归类错因' }
+      ]}
+    ],
+    p4: [
+      { block:'morning', label:'早晨 · 冲刺', hint:'约 30 分钟', items:[
+        { id:'p4_tpl', text:'背作文模板 + 高级替换词' },
+        { id:'p4_tran', text:'过翻译高频词组 10 组' }
+      ]},
+      { block:'noon', label:'午间 · 听力', hint:'约 30 分钟', items:[
+        { id:'p4_ls', text:'听力 30 分钟，保持手感' }
+      ]},
+      { block:'evening', label:'晚间 · 模考 / 复盘', hint:'约 2 小时', items:[
+        { id:'p4_mock', text:'整卷限时模考（隔天一次，严格 9:00–11:20）' },
+        { id:'p4_review', text:'非模考日：复盘错题 + 薄弱题型再练' },
+        { id:'p4_mind', text:'睡前默写 1 篇作文模板' }
+      ]},
+      { block:'sunday', label:'周日 · 全真模拟', hint:'本周收尾', items:[
+        { id:'p4_paper', text:'整卷全真模考 1 套' },
+        { id:'p4_rest', text:'模考后只复盘，不做新题' }
+      ]}
+    ]
+  };
+
+  var TOOL_LINKS = {
+    word: 'https://word.bmpi.dev/',
+    ting: 'https://ting.eudic.net/',
+    zhenti: 'https://www.yeyulingfeng.com/a/645664.html',
+    tpl: 'https://mtoutiao.xdf.cn/cet4-6/202601/15072575.html'
+  };
+
+  var QUICK_HTML = '<div class="quick">'
+    + '<a href="' + TOOL_LINKS.word + '" target="_blank" rel="noopener"><span class="q-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg></span><span class="q-name">去背词</span><span class="q-note">Qwerty Learner 打字背词</span></a>'
+    + '<a href="' + TOOL_LINKS.ting + '" target="_blank" rel="noopener"><span class="q-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="q-name">去听听力</span><span class="q-note">每日英语听力 · 四级专区</span></a>'
+    + '<a href="' + TOOL_LINKS.zhenti + '" target="_blank" rel="noopener"><span class="q-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span><span class="q-name">去下真题</span><span class="q-note">历年真题 + 音频</span></a>'
+    + '<a href="' + TOOL_LINKS.tpl + '" target="_blank" rel="noopener"><span class="q-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span><span class="q-name">作文模板</span><span class="q-note">三段式万能模板</span></a>'
+    + '</div>';
+
+  var RESOURCES = [
+    { cat:'词汇', desc:'背词主战场 · 每天 40 个新词 + 复习', items:[
+      { name:'Qwerty Learner 在线背词', url:'https://word.bmpi.dev/', note:'打字背四级词 · 音标发音 · 在线免费，电脑推荐' },
+      { name:'word-wind 在线背词', url:'https://word-wind.pages.dev/', note:'网页即开即用，手机也能背' },
+      { name:'墨墨背单词（App）', url:'https://www.maimemo.com/', note:'抗遗忘算法，选“四级”词书，碎片时间复习' },
+      { name:'四级大纲 4500 词表（PDF）', url:'https://www.yeyulingfeng.com/a/581834.html', note:'正序/乱序/默写表，可打印自测' },
+      { name:'开源四级词库（json/txt）', url:'https://github.com/KyleBing/english-vocabulary', note:'四六级/考研词库，适合做数据或导入' },
+      { name:'Anki 四级牌组', url:'https://github.com/XANXUS2/myAnki', note:'间隔重复记忆；Anki 客户端：apps.ankiweb.net' }
+    ]},
+    { cat:'听力', desc:'听力占 35% 分值，每天精听不断', items:[
+      { name:'每日英语听力（官方）', url:'https://ting.eudic.net/', note:'四级真题专区 · 单句精听 · 倍速 · 跟读打分，电脑/手机都有' }
+    ]},
+    { cat:'真题', desc:'近 3–5 年真题 + 音频，别刷模拟题', items:[
+      { name:'历年真题全套（PDF + 听力 + 解析）', url:'https://www.yeyulingfeng.com/a/645664.html', note:'2015–2025 全套真题 + 答案详解 + 听力音频，免费下载' },
+      { name:'友沃可真题库', url:'https://pan.uvooc.com/Learn/CET/', note:'四六级真题资料合集，网盘下载' }
+    ]},
+    { cat:'写译', desc:'写作 + 翻译共占 30%，靠模板拿基础分', items:[
+      { name:'新东方：3 个最经典作文万能模板', url:'https://mtoutiao.xdf.cn/cet4-6/202601/15072575.html', note:'议论文 / 图表 / 应用文，三段式可直接背' },
+      { name:'外研社：写作必背模板 + 句型', url:'https://heep.fltrp.com/contents/443572397824675840?type=1', note:'应用文 + 议论文句式卡片' },
+      { name:'作文万能句（B 站）', url:'https://www.bilibili.com/opus/1193280470530392084', note:'万能句完整版，冲刺期集中背' }
+    ]},
+    { cat:'官方', desc:'考试报名、时间、规则以官网为准', items:[
+      { name:'中国教育考试网 CET 专栏', url:'https://cet.neea.cn/', note:'报名（9/15–9/26）、准考证、成绩查询官方入口' }
+    ]}
+  ];
+
+  /* ============ 状态（localStorage） ============ */
+  var STORE_KEY = 'cet4_wb_tasks_v1';
+  var store = { tasks: {} };
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.tasks) store = parsed;
+    }
+  } catch(e){ store = { tasks: {} }; }
+
+  function saveStore(){
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+    catch(e){ /* 存储不可用时忽略 */ }
+  }
+  function doneIds(key){
+    var arr = store.tasks[key];
+    return arr ? arr : [];
+  }
+  function toggleTask(dateKey, id){
+    var arr = store.tasks[dateKey] || [];
+    var i = arr.indexOf(id);
+    if (i >= 0) arr.splice(i, 1); else arr.push(id);
+    store.tasks[dateKey] = arr;
+    saveStore();
+  }
+
+  /* ============ 工具函数 ============ */
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function phaseMeta(key){
+    for (var i = 0; i < PHASES.length; i++) if (PHASES[i].key === key) return PHASES[i];
+    return null;
+  }
+  var ICON_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+
+  /* ============ 顶部信息 ============ */
+  function renderTop(){
+    var today = new Date();
+    var dl = daysUntilExam(today);
+    var el = document.getElementById('countdown-num');
+    var tl = document.getElementById('todayline');
+    var dateStr = today.getFullYear() + ' 年 ' + (today.getMonth()+1) + ' 月 ' + today.getDate() + ' 日';
+    var wk = ['日','一','二','三','四','五','六'][today.getDay()];
+    var line = dateStr + ' · 星期' + wk;
+    var p = phaseFor(today);
+    if (p === 'before'){ el.textContent = '未开始'; tl.textContent = line + ' · 备考 9/1 开始，先准备好词表和真题'; }
+    else if (p === 'exam'){ el.textContent = '今天考试'; tl.textContent = line + ' · 四级笔试日，放轻松，加油'; }
+    else if (p === 'after'){ el.textContent = '已考完'; tl.textContent = line + ' · 考试已结束'; }
+    else { el.textContent = dl > 0 ? dl : 0; tl.textContent = line + ' · 备考第 ' + (daysSinceStart(today)+1) + ' 天 · 第 ' + weekNo(today) + ' 周'; }
+  }
+
+  /* ============ 今日视图 ============ */
+  function renderToday(){
+    var box = document.getElementById('view-today');
+    var today = new Date();
+    var p = phaseFor(today);
+    var isSunday = today.getDay() === 0;
+
+    /* 报名提醒（通用） */
+    var alertHtml = '';
+    var now = midnight(today).getTime();
+    var regS = new Date(2026,8,15).getTime(), regE = new Date(2026,8,26).getTime();
+    if (now < regS){
+      alertHtml = '<div class="alert"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div>别忘报名：<b>9/15 – 9/26</b> 通过学校报名 2026 年 12 月四级笔试。错过不能补报。</div></div>';
+    } else if (now >= regS && now <= regE){
+      alertHtml = '<div class="alert"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div>报名进行中（9/15 – 9/26），<b>今天就确认已报名</b>，别拖到最后。</div></div>';
+    }
+
+    function taskRow(it, dateFor){
+      var key = dkey(dateFor);
+      var done = doneIds(key).indexOf(it.id) >= 0;
+      return '<div class="task-item' + (done ? ' done' : '') + '" data-task="' + it.id + '">'
+        + '<button class="task-check" type="button" aria-label="勾选：' + esc(it.text) + '">' + ICON_CHECK + '</button>'
+        + '<div class="task-text">' + esc(it.text) + '</div></div>';
+    }
+
+    var html = '';
+
+    if (p === 'before'){
+      var prep = [
+        { id:'prep_zhenti', text:'下载近 5 年真题 PDF + 听力音频（去“学习资源”拿链接）' },
+        { id:'prep_ting', text:'安装“每日英语听力”，收藏四级真题专区' },
+        { id:'prep_momo', text:'手机装“墨墨背单词”，导入四级词书' },
+        { id:'prep_struc', text:'看懂试卷结构：听力 35% + 阅读 35% + 写译 30%' },
+        { id:'prep_print', text:'打印 4500 词表 / 建好生词本' }
+      ];
+      var prepHtml = '';
+      prep.forEach(function(it){ prepHtml += taskRow(it, today); });
+      html = alertHtml
+        + '<div class="phase-banner">'
+        + '<div><div class="pb-tag">备考 9/1 正式开始</div>'
+        + '<div class="pb-name">先把装备备齐</div>'
+        + '<div class="pb-date">今天 · 距 12/12 考试 ' + daysUntilExam(today) + ' 天</div></div>'
+        + '<div class="pb-right">勾完下面清单即可开跑</div>'
+        + '</div>'
+        + '<div class="card"><h2>考前准备清单</h2>'
+        + '<div class="desc">9/1 正式开跑前，把工具备齐。勾掉一项是一项，进度会自动记录。</div>'
+        + prepHtml + '</div>'
+        + '<div class="card"><h2>快捷入口</h2><div class="desc" style="margin-bottom:12px">现在就先用起来</div>' + QUICK_HTML + '</div>';
+    } else if (p === 'exam'){
+      html = '<div class="card"><h2>今天四级笔试</h2><div class="desc">带上准考证、身份证、2B 铅笔、耳机。按平时节奏做，先易后难，作文留好时间。加油！</div></div>';
+    } else if (p === 'after'){
+      html = '<div class="card"><h2>考试已结束</h2><div class="desc">辛苦了。成绩查询入口在中国教育考试网（资源页）。这套工作台随时可以清零重来。</div></div>';
+    } else {
+      var ph = phaseMeta(p);
+      var week = weekNo(today);
+      var phaseIdx = PHASES.indexOf(ph);
+      var fillCells = Math.max(0, Math.min(15, week));
+      var totalTasks = 0, doneCount = 0;
+      var blocksHtml = '';
+
+      TASKS[p].forEach(function(blk){
+        if (blk.block === 'sunday' && !isSunday) return;
+        blocksHtml += '<div class="task-block">'
+          + '<div class="task-block-title">' + esc(blk.label)
+          + (blk.hint ? ' <span class="blk-hint">' + esc(blk.hint) + '</span>' : '')
+          + '</div>';
+        blk.items.forEach(function(it){
+          totalTasks++;
+          if (doneIds(dkey(today)).indexOf(it.id) >= 0) doneCount++;
+          blocksHtml += taskRow(it, today);
+        });
+        blocksHtml += '</div>';
+      });
+
+      /* 15 格进度带 */
+      var cellsHtml = '';
+      for (var i = 1; i <= 15; i++){
+        var cls = 'week-cell';
+        if (i < fillCells) cls += ' filled';
+        else if (i === fillCells) cls += ' cur';
+        cellsHtml += '<div class="' + cls + '"><span class="w">' + i + '</span></div>';
+      }
+
+      var pct = Math.round((daysSinceStart(today)+1) / 103 * 100);
+      var pctClamped = Math.max(0, Math.min(100, pct));
+
+      html = alertHtml
+        + '<div class="phase-banner">'
+        + '<div><div class="pb-tag">当前阶段 · 第 ' + week + ' 周</div>'
+        + '<div class="pb-name">' + esc(ph.name) + '</div>'
+        + '<div class="pb-date">' + esc(ph.dates) + ' · 本周重点：' + esc(ph.weekPlan[0]) + '</div></div>'
+        + '<div class="pb-right">已完成 ' + doneCount + ' / ' + totalTasks + ' 项</div>'
+        + '</div>'
+
+        + '<div class="weeks">' + cellsHtml + '</div>'
+        + '<div class="weeks-label"><span>第 1 周 · 9/1</span><span>今日 · 第 ' + week + ' 周</span><span>12/12 考试</span></div>'
+
+        + '<div class="card"><div class="card-head"><h2>今日任务</h2>'
+        + '<span class="tag" style="background:var(--primary-soft);color:var(--primary-deep);font-size:11px;padding:3px 10px;border-radius:20px">' + doneCount + ' / ' + totalTasks + '</span></div>'
+        + '<div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width:' + (totalTasks ? Math.round(doneCount/totalTasks*100) : 0) + '%"></div></div>'
+        + '<div class="progress-text"><span>今日进度</span><span>' + (totalTasks ? Math.round(doneCount/totalTasks*100) : 0) + '%</span></div></div>'
+        + blocksHtml
+        + '</div>'
+
+        + '<div class="card"><h2>快捷入口</h2><div class="desc" style="margin-bottom:12px">对应上面任务，点开就练</div>' + QUICK_HTML + '</div>'
+
+        + '<div class="card"><h2>本周总进度</h2><div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width:' + pctClamped + '%"></div></div>'
+        + '<div class="progress-text"><span>备考第 ' + (daysSinceStart(today)+1) + ' 天 / 共 103 天</span><span>' + pctClamped + '%</span></div></div>'
+        + '<div class="desc" style="margin-top:10px">阶段 ' + (phaseIdx+1) + ' / 4 · ' + esc(ph.name) + '（' + esc(ph.dates) + '）</div></div>';
+    }
+
+    box.innerHTML = html;
+  }
+
+  /* ============ 计划视图 ============ */
+  function renderPlan(){
+    var box = document.getElementById('view-plan');
+    var today = new Date();
+    var cur = phaseFor(today);
+    var html = '<div class="card"><h2>15 周备考路线</h2>'
+      + '<div class="desc">从 9/1 到 12/11，四个阶段由浅入深。每天 2–2.5 小时：早背词、午听力、晚刷题。当天任务在“今日任务”里打卡。</div></div>';
+
+    var tl = '<div class="timeline">';
+    for (var i = 0; i < PHASES.length; i++){
+      var ph = PHASES[i];
+      var isCur = ph.key === cur;
+      var tagStyle = 'background:' + ph.soft + ';color:' + ph.color;
+      tl += '<div class="tl-node">'
+        + '<div class="phase-card">'
+        + '<div class="phase-head">'
+        + '<span class="phase-dot" style="background:' + ph.color + '"></span>'
+        + '<span class="phase-name">' + esc(ph.name) + '</span>'
+        + '<span class="phase-meta">' + esc(ph.weeks) + ' · ' + esc(ph.dates) + '</span>'
+        + '<span class="phase-tag" style="' + tagStyle + '">' + (isCur ? '当前 · ' : '') + esc(ph.tag) + '</span>'
+        + '</div>'
+        + '<div class="phase-desc">' + esc(ph.desc) + '</div>'
+        + '<div class="phase-body"><h4>每周安排</h4><ul>'
+        + ph.weekPlan.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('')
+        + '</ul></div>'
+        + '</div></div>';
+    }
+    tl += '</div>';
+    html += tl;
+
+    box.innerHTML = html;
+  }
+
+  /* ============ 资源视图 ============ */
+  function renderResources(){
+    var box = document.getElementById('view-resources');
+    var html = '<div class="card"><h2>学习资源总表</h2>'
+      + '<div class="desc">按板块整理，点击即打开。都来自公开可用的免费渠道，配合今日任务使用。</div></div>';
+    html += '<div class="res-cats">';
+    RESOURCES.forEach(function(cat){
+      html += '<div class="res-cat">'
+        + '<div class="res-cat-head"><span class="rc-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg></span><h3>' + esc(cat.cat) + '</h3></div>'
+        + '<div class="rc-desc">' + esc(cat.desc) + '</div>';
+      cat.items.forEach(function(it){
+        html += '<a class="res-item" href="' + esc(it.url) + '" target="_blank" rel="noopener">'
+          + '<div class="ri-body"><div class="ri-name">' + esc(it.name) + '</div><div class="ri-note">' + esc(it.note) + '</div></div>'
+          + '<span class="ri-go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>'
+          + '</a>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="external-note">说明：链接指向外部公开资源，如遇失效请告诉我，我会替换为可用地址。打卡与进度数据只存在这台设备浏览器里。</div>';
+    box.innerHTML = html;
+  }
+
+  /* ============ 日历视图 ============ */
+  var CAL_MONTHS = [
+    { y:2026, m:8 }, { y:2026, m:9 }, { y:2026, m:10 }, { y:2026, m:11 }
+  ];
+  var calIndex = 1; // 默认当月（10月=2026年10月）或就近
+
+  function taskTotalForDate(d){
+    var p = phaseFor(d);
+    if (p !== 'p1' && p !== 'p2' && p !== 'p3' && p !== 'p4') return 0;
+    var blocks = TASKS[p];
+    var total = 0;
+    for (var i = 0; i < blocks.length; i++){
+      if (blocks[i].block === 'sunday' && d.getDay() !== 0) continue;
+      total += blocks[i].items.length;
+    }
+    return total;
+  }
+
+  function renderCalendar(){
+    var box = document.getElementById('view-calendar');
+    var today = new Date();
+    var cur = CAL_MONTHS[calIndex];
+    var y = cur.y, m = cur.m;
+    var first = new Date(y, m, 1);
+    var daysInMonth = new Date(y, m + 1, 0).getDate();
+    var startDow = first.getDay();
+
+    var html = '<div class="card">';
+    html += '<div class="cal-head"><div class="cal-month">' + y + ' 年 ' + (m+1) + ' 月</div>'
+      + '<div class="cal-nav"><button type="button" data-cal="-1" aria-label="上个月"' + (calIndex <= 0 ? ' disabled' : '') + '>&lsaquo;</button>'
+      + '<button type="button" data-cal="1" aria-label="下个月"' + (calIndex >= CAL_MONTHS.length-1 ? ' disabled' : '') + '>&rsaquo;</button></div></div>';
+
+    html += '<div class="cal-grid">';
+    var dows = ['日','一','二','三','四','五','六'];
+    for (var w = 0; w < 7; w++) html += '<div class="cal-dow">' + dows[w] + '</div>';
+    for (var s = 0; s < startDow; s++) html += '<div class="cal-cell out"></div>';
+    for (var d = 1; d <= daysInMonth; d++){
+      var date = new Date(y, m, d);
+      var key = dkey(date);
+      var p = phaseFor(date);
+      var cls = 'cal-cell';
+      var bar = '';
+      var tag = '';
+      if (p === 'before' || p === 'after'){
+        cls += ' out';
+      } else if (p === 'exam'){
+        cls += ' exam';
+        tag = '<div class="d" style="color:var(--accent)">' + d + '</div><span style="font-size:10px;color:var(--accent)">考试</span>';
+      } else {
+        var total = taskTotalForDate(date);
+        var done = doneIds(key).length;
+        var isToday = key === dkey(today);
+        if (isToday) cls += ' today';
+        if (total > 0 && done >= total) cls += ' done';
+        else if (done > 0) cls += ' partial';
+        if (total > 0){
+          var ratio = done / total;
+          var bw = Math.round(ratio * 100);
+          bar = '<div class="cal-bar" style="width:' + bw + '%"></div>';
+        }
+        if (!isToday){
+          tag = '<div class="d">' + d + '</div>';
+        } else {
+          tag = '<div class="d" style="color:var(--accent)">今天 ' + d + '</div>';
+        }
+      }
+      html += '<div class="' + cls + '">' + (tag || '<div class="d">' + d + '</div>') + bar + '</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="cal-legend">'
+      + '<span><i class="lg-done"></i>全部完成</span>'
+      + '<span><i class="lg-part"></i>部分完成</span>'
+      + '<span><i class="lg-today"></i>今天</span>'
+      + '</div></div>';
+    box.innerHTML = html;
+  }
+
+  /* ============ 路由（JS 驱动，不依赖浏览器 hash 跳转） ============ */
+  function closestEl(el, sel){
+    var n = el;
+    while (n && n.nodeType === 1){
+      if (n.matches && n.matches(sel)) return n;
+      n = n.parentNode;
+    }
+    return null;
+  }
+
+  function switchView(route){
+    var valid = ['today','plan','resources','calendar'];
+    if (valid.indexOf(route) < 0) route = 'today';
+
+    var views = document.querySelectorAll('.view');
+    for (var i = 0; i < views.length; i++){
+      views[i].classList.toggle('active', views[i].getAttribute('data-route') === route);
+    }
+    var navs = document.querySelectorAll('[data-nav]');
+    for (var j = 0; j < navs.length; j++){
+      navs[j].classList.toggle('active', navs[j].getAttribute('data-nav') === route);
+    }
+
+    if (route === 'today') renderToday();
+    if (route === 'plan') renderPlan();
+    if (route === 'resources') renderResources();
+    if (route === 'calendar') renderCalendar();
+
+    try {
+      if (location.hash !== '#/' + route) history.replaceState(null, '', '#/' + route);
+    } catch(e){ /* 部分沙箱环境不允许改地址，忽略 */ }
+  }
+
+  function router(){
+    var hash = location.hash || '#/today';
+    switchView(hash.replace('#/', ''));
+  }
+
+  function bindNav(){
+    var links = document.querySelectorAll('a[data-nav]');
+    for (var i = 0; i < links.length; i++){
+      (function(a){
+        a.addEventListener('click', function(ev){
+          ev.preventDefault();
+          switchView(a.getAttribute('data-nav'));
+        });
+      })(links[i]);
+    }
+  }
+
+  function bindInteractions(){
+    /* 今日任务勾选：事件委托 */
+    var todayView = document.getElementById('view-today');
+    todayView.addEventListener('click', function(ev){
+      var row = closestEl(ev.target, '.task-item[data-task]');
+      if (!row) return;
+      if (closestEl(ev.target, 'a')) return;
+      toggleTask(dkey(new Date()), row.getAttribute('data-task'));
+      renderToday();
+      renderCalendar();
+    });
+
+    /* 日历翻月：事件委托 */
+    var calView = document.getElementById('view-calendar');
+    calView.addEventListener('click', function(ev){
+      var btn = closestEl(ev.target, 'button[data-cal]');
+      if (!btn) return;
+      var step = parseInt(btn.getAttribute('data-cal'), 10);
+      calIndex += step;
+      renderCalendar();
+    });
+
+    /* 外链：先拦截默认跳转，优先新窗口打开；被拦截则当前页打开 */
+    document.addEventListener('click', function(ev){
+      var a = closestEl(ev.target, 'a[href^="http"]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href) return;
+      ev.preventDefault();
+      var w = null;
+      try { w = window.open(href, '_blank'); } catch(e){ w = null; }
+      if (w === null){
+        try { location.href = href; } catch(e){ /* 忽略 */ }
+      }
+    });
+  }
+
+  /* 全局错误提示（便于发现运行时报错） */
+  window.addEventListener('error', function(e){
+    var bar = document.getElementById('errbar');
+    if (!bar) return;
+    bar.style.display = 'block';
+    bar.textContent = '脚本错误：' + (e.message || '未知错误');
+  });
+
+  /* 初始化：定位到当前月份 */
+  (function initCalIndex(){
+    var today = new Date();
+    for (var i = 0; i < CAL_MONTHS.length; i++){
+      if (CAL_MONTHS[i].y === today.getFullYear() && CAL_MONTHS[i].m === today.getMonth()){
+        calIndex = i; return;
+      }
+    }
+    // 非备考月份：就近取第一个未过去的月份
+    calIndex = 0;
+  })();
+
+  renderTop();
+  router();
+  bindNav();
+  bindInteractions();
+  window.addEventListener('hashchange', router);
+
+  setInterval(renderTop, 60000); // 每分钟校准日期倒计时
+})();
+</script>
+</body>
+</html>
